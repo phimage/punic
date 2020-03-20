@@ -16,7 +16,7 @@ struct Punic: ParsableCommand {
     static let configuration = CommandConfiguration(
         abstract: "Inject carthage xcodeproj into workspace.")
     
-    @Option(default: "", help: "The number of elements to choose.")
+    @Option(default: "", help: "The project path.")
     var path: String
     
     @Option(default: false, help: "Print debug information.")
