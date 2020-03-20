@@ -28,8 +28,7 @@ punic --path <your project root path>
 swift build
 ```
 
-
-## Why `punic` ?
+## Why this project is named `punic` ?
 
 > The ancient city was destroyed by the Roman Republic in the Third Punic War in 146 BC and then re-developed as Roman Carthage
 
