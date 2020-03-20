@@ -2,6 +2,10 @@
 
 Add [Carthage](https://github.com/Carthage/Carthage) sources project into xcode workspace.
 
+## Why?
+
+To remove the usage of binary frameworks introduced by [Carthage](https://github.com/Carthage/Carthage) and to go back to developpement with sources.
+
 ## Usage
 
 ### For current path
@@ -25,7 +29,7 @@ swift build
 ```
 
 
-## Why punic?
+## Why `punic?
 
 > The ancient city was destroyed by the Roman Republic in the Third Punic War in 146 BC and then re-developed as Roman Carthage
 
