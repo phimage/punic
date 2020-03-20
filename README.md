@@ -1,5 +1,7 @@
 # punic
 
+![Swift](https://github.com/phimage/punic/workflows/Swift/badge.svg)
+
 Add [Carthage](https://github.com/Carthage/Carthage) sources project into xcode workspace.
 
 ## Why?
@@ -27,6 +29,12 @@ punic --path <your project root path>
 ```
 swift build
 ```
+
+## Dependencies
+
+- [ArgumentParser](https://swift.org/blog/argument-parser/) for parsing command line arguments 
+- [FileKit](https://github.com/nvzqz/FileKit) for file browsing
+- [AEXML](https://github.com/tadija/AEXML) for XML parsing and modifying
 
 ## Why this project is named `punic` ?
 
