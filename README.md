@@ -1,2 +1,34 @@
 # punic
-add Carthage sources project into workspace 
+
+Add [Carthage](https://github.com/Carthage/Carthage) sources project into xcode workspace.
+
+## Usage
+
+### For current path
+
+```
+punic
+```
+
+### or for specific path
+
+```
+punic --path <your project root path>
+```
+
+## Install 
+
+### From source
+
+```
+swift build
+```
+
+
+## Why punic?
+
+> The ancient city was destroyed by the Roman Republic in the Third Punic War in 146 BC and then re-developed as Roman Carthage
+
+https://en.wikipedia.org/wiki/Carthage
+
+[![Punic Wars](https://pbs.twimg.com/media/DpPTMsgWwAAnXq1?format=jpg&name=thumb)](https://twitter.com/sara_boutall/status/1050415438923005958)
