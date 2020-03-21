@@ -8,40 +8,53 @@ import FileKit
 
 extension Path {
     
+    enum Extension: String {
+        case xcodeproj
+        case xcworkspace
+    }
+
     func findXcodeProj() -> Path? {
-        var xcodeprojPath = self + "\(self.fileName).xcodeproj"
+        var xcodeprojPath = self + "\(self.fileName).\(Path.Extension.xcodeproj)"
         if xcodeprojPath.exists {
             return xcodeprojPath
         }
-        xcodeprojPath = (self + self.fileName) + "\(self.fileName).xcodeproj"
+        xcodeprojPath = (self + self.fileName) + "\(self.fileName).\(Path.Extension.xcodeproj)"
         if xcodeprojPath.exists {
             return xcodeprojPath
         }
-        xcodeprojPath = (self + self.fileName) + "\(self.fileName).xcodeproj"
+        xcodeprojPath = (self + self.fileName) + "\(self.fileName).\(Path.Extension.xcodeproj)"
         if xcodeprojPath.exists {
             return xcodeprojPath
         }
-        xcodeprojPath = (self + "\(self.fileName)Example") + "\(self.fileName)Example.xcodeproj"
+        xcodeprojPath = (self + "\(self.fileName)Example") + "\(self.fileName)Example.\(Path.Extension.xcodeproj)"
         if xcodeprojPath.exists {
             return xcodeprojPath
         }
-        xcodeprojPath = (self + "Example") + "\(self.fileName).xcodeproj"
+        xcodeprojPath = (self + "Example") + "\(self.fileName).\(Path.Extension.xcodeproj)"
         if xcodeprojPath.exists {
             return xcodeprojPath
         }
-        return nil
+        return self.find(searchDepth: 0, condition: { $0.has(extension: .xcodeproj) }).first
     }
 
     func findXcodeWorkspace() -> Path? {
-        let xcworkspacePath = self + "\(self.fileName).xcworkspace"
+        let xcworkspacePath = self + "\(self.fileName).\(Path.Extension.xcworkspace)"
         if xcworkspacePath.exists {
             return xcworkspacePath
         }
-        if let first = self.find(condition: {$0.pathExtension == "xcworkspace"}).first {
-            return first
+        return self.find(searchDepth: 0, condition: { $0.has(extension: .xcworkspace) }).first
+    }
+
+    func find(extension ext: Extension) -> Path? {
+        switch ext {
+        case .xcodeproj:
+            return self.findXcodeProj()
+        case .xcworkspace:
+            return self.findXcodeWorkspace()
         }
-        return nil
+    }
+
+    func has(extension ext: Extension) -> Bool {
+        return self.pathExtension == ext.rawValue
     }
 }
-
-// MARK: cmd
