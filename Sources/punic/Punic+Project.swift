@@ -74,7 +74,24 @@ extension Punic {
 
             var hasChange = false
 
-            error("Not implemented")
+            let project = xcodeProject.project
+            // remove script phrase with file in "Carthage/Build", suppose copy phase
+            for target in project.targets {
+                for buildPhase in target.buildPhases {
+                    if let scriptPhase = buildPhase as? PBXShellScriptBuildPhase {
+                        if scriptPhase.inputPaths.contains(where: { $0.contains("Carthage/Build")}) {
+                            target.remove(object: scriptPhase, forKey: "buildPhases")
+                            scriptPhase.destroy()
+                            hasChange = true
+                        }
+                    }
+                }
+                /*for buildConfiguration in target.buildConfigurationList?.buildConfigurations ?? [] {
+                    if var buildSettings = buildConfiguration.buildSettings {
+                       "FRAMEWORK_SEARCH_PATHS", remove "$(PROJECT_DIR)/Carthage/Build/iOS",
+                    }
+                }*/
+            }
 
             if hasChange {
                 do {
