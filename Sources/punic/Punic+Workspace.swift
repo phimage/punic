@@ -55,7 +55,7 @@ extension Punic {
 
         func run() {
             let projectPath = self.rootPath
-            let carthagePath: Path = projectPath + "Carthage/Checkouts"
+            let carthagePath: Path = projectPath + sourceDir
             guard let workspacePath: Path = self.workspacePath else {
                 error("Cannot find workspace in \(projectPath)") // XXX maybe create an empty one
                 return

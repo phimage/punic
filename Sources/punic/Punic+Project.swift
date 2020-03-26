@@ -75,24 +75,51 @@ extension Punic {
             var hasChange = false
 
             let project = xcodeProject.project
-            // remove script phrase with file in "Carthage/Build", suppose copy phase
             for target in project.targets {
+                // remove script phrase with file in "Carthage/Build", suppose copy phase
                 for buildPhase in target.buildPhases {
                     if let scriptPhase = buildPhase as? PBXShellScriptBuildPhase {
-                        if scriptPhase.inputPaths.contains(where: { $0.contains("Carthage/Build")}) {
-                            target.remove(object: scriptPhase, forKey: "buildPhases")
+                        if scriptPhase.inputPaths.contains(where: { $0.contains(buildDir)}) {
+                            target.remove(object: scriptPhase, forKey: PBXTarget.PBXKeys.buildPhases)
                             scriptPhase.destroy()
                             hasChange = true
+                            debug("⚙️ Build script phrase \(scriptPhase.name ?? "") removed")
                         }
                     }
                 }
-                /*for buildConfiguration in target.buildConfigurationList?.buildConfigurations ?? [] {
+                // Remove from FRAMEWORK_SEARCH_PATHS
+                for buildConfiguration in target.buildConfigurationList?.buildConfigurations ?? [] {
                     if var buildSettings = buildConfiguration.buildSettings {
-                       "FRAMEWORK_SEARCH_PATHS", remove "$(PROJECT_DIR)/Carthage/Build/iOS",
+                        if var searchPaths = buildSettings["FRAMEWORK_SEARCH_PATHS"] as? [String] {
+                            if searchPaths.contains(where: { $0.hasPrefix("$(PROJECT_DIR)/\(buildDir)") }) {
+                                searchPaths = searchPaths.filter({!$0.hasPrefix("$(PROJECT_DIR)/\(buildDir)")})
+                                hasChange = true
+                                buildSettings["FRAMEWORK_SEARCH_PATHS"]=searchPaths
+                                buildConfiguration.set(value: buildSettings, into: PBXBuildStyle.PBXKeys.buildSettings)
+                                debug("🔍 FRAMEWORK_SEARCH_PATHS edited for configuration \(buildConfiguration.name ?? buildConfiguration.description)")
+                            }
+                        }
                     }
-                }*/
+                }
+            }
+            // Change frameworkd file references path
+            let buildProductsDir = SourceTreeFolder.buildProductsDir.rawValue
+            for fileRef in project.mainGroup?.fullFileRefs ?? []{
+                if let path = fileRef.path, path.contains(buildDir) {
+                    switch (fileRef.sourceTree ?? SourceTree.group) {
+                    case SourceTree.relativeTo(to: SourceTreeFolder.buildProductsDir):
+                        break
+                    default:
+                        fileRef.set(value: buildProductsDir, into: PBXReference.PBXKeys.sourceTree)
+                        let name = fileRef.name ?? path
+                        fileRef.set(value: name, into: PBXReference.PBXKeys.path)
+                        hasChange = true
+                        debug("📦 \(String(describing: name)) path changed to \(buildProductsDir)")
+                    }
+                }
             }
 
+            // If has change, write to file
             if hasChange {
                 do {
                     try xcodeProject.write(to: projectDataPath.url, format: .openStep)
@@ -104,5 +131,15 @@ extension Punic {
                 debug("❄️ Nothing to change")
             }
         }
+    }
+}
+
+extension PBXGroup {
+
+    /// recursively get file refs
+    var fullFileRefs: [PBXFileReference] {
+        var result = self.fileRefs
+        result += subGroups.flatMap { $0.fullFileRefs }
+        return result
     }
 }

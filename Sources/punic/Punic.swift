@@ -16,3 +16,6 @@ struct Punic: ParsableCommand {
         defaultSubcommand: Workspace.self)
 
 }
+
+let buildDir = "Carthage/Build"
+let sourceDir = "Carthage/Checkouts"
