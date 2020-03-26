@@ -81,7 +81,7 @@ extension Punic {
                     if let scriptPhase = buildPhase as? PBXShellScriptBuildPhase {
                         if scriptPhase.inputPaths.contains(where: { $0.contains(buildDir)}) {
                             target.remove(object: scriptPhase, forKey: PBXTarget.PBXKeys.buildPhases)
-                            scriptPhase.destroy()
+                            scriptPhase.unattach()
                             hasChange = true
                             debug("⚙️ Build script phrase \(scriptPhase.name ?? "") removed")
                         }
@@ -104,7 +104,8 @@ extension Punic {
             }
             // Change frameworkd file references path
             let buildProductsDir = SourceTreeFolder.buildProductsDir.rawValue
-            for fileRef in project.mainGroup?.fullFileRefs ?? []{
+            let fullFileRefs = project.mainGroup?.fullFileRefs ?? []
+            for fileRef in fullFileRefs {
                 if let path = fileRef.path, path.contains(buildDir) {
                     switch (fileRef.sourceTree ?? SourceTree.group) {
                     case SourceTree.relativeTo(to: SourceTreeFolder.buildProductsDir):
@@ -115,6 +116,43 @@ extension Punic {
                         fileRef.set(value: name, into: PBXReference.PBXKeys.path)
                         hasChange = true
                         debug("📦 \(String(describing: name)) path changed to \(buildProductsDir)")
+                    }
+                }
+            }
+            // Embed frameworkds
+            for target in project.targets {
+                let buildPhases = target.buildPhases
+                let copyFilesBuildPhases = buildPhases.compactMap({$0 as? PBXCopyFilesBuildPhase})
+                for copyfilesPhase in copyFilesBuildPhases {
+                    if copyfilesPhase.name == "Embed Frameworks" {
+                        let files = copyfilesPhase.files
+                        let otherBuildPhases = buildPhases.compactMap({$0 as? PBXFrameworksBuildPhase})
+                        let otherBuildFiles = otherBuildPhases.flatMap({$0.files})
+                        // for each fileRef of framework in build phease
+                        for otherBuildFile in otherBuildFiles {
+                            guard let fileRef = otherBuildFile.fileRef as? PBXFileReference else {
+                                continue
+                            }
+                            guard fileRef.lastKnownFileType ?? fileRef.explicitFileType == "wrapper.framework" else {
+                                continue
+                            }
+                            guard !files.contains(where: { $0.fileRef as? PBXFileReference == fileRef}) else {
+                                continue // already added
+                            }
+                            let fields: PBXObject.Fields = [
+                                PBXBuildFile.PBXKeys.fileRef.rawValue: fileRef.ref,
+                                PBXBuildFile.PBXKeys.settings.rawValue: ["ATTRIBUTES": ["CodeSignOnCopy", "RemoveHeadersOnCopy"]] // TODO option sign or not
+                            ]
+                            var newRef = XcodeUUID.generate()
+                            while xcodeProject.objects.object(newRef) != nil {
+                                newRef = XcodeUUID.generate()
+                            }
+                            let embedFile = PBXBuildFile(ref: newRef, fields: fields, objects: xcodeProject.objects)
+                            embedFile.attach()
+                            copyfilesPhase.add(object: embedFile, into: PBXBuildPhase.PBXKeys.files)
+                            debug("🚀 Embed framework \(fileRef.name ?? fileRef.path ?? fileRef.description) with ref \(newRef)")
+                            hasChange = true
+                        }
                     }
                 }
             }
@@ -134,12 +172,8 @@ extension Punic {
     }
 }
 
-extension PBXGroup {
-
-    /// recursively get file refs
-    var fullFileRefs: [PBXFileReference] {
-        var result = self.fileRefs
-        result += subGroups.flatMap { $0.fullFileRefs }
-        return result
+extension XcodeUUID {
+    static func generate() -> XcodeUUID {
+        return String(format: "%06X%06X%06X%06X", Int(arc4random() % 65535), Int(arc4random() % 65535), Int(arc4random() % 65535), Int(arc4random() % 65535))
     }
 }
