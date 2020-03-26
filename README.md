@@ -2,9 +2,8 @@
 
 ![Swift](https://github.com/phimage/punic/workflows/Swift/badge.svg)
 
-Add dependencies sources project introduced by [Carthage](https://github.com/Carthage/Carthage) into your Xcode workspace.
-
-Remove copy framework build phrase from Xcode project.
+- Add dependencies sources project introduced by [Carthage](https://github.com/Carthage/Carthage) into your Xcode workspace.
+- Remove copy framework build phrase from Xcode project and embed frameworks instead.
 
 ## Why?
 
@@ -14,8 +13,16 @@ To remove the usage of binary frameworks introduced by [Carthage](https://github
 
 ### For current path
 
+#### Edit workspace
+
 ```bash
-punic
+punic workspace
+```
+
+#### Edit project
+
+```bash
+punic project
 ```
 
 ### or for specific path
@@ -23,6 +30,7 @@ punic
 ```bash
 punic --path <your project root path>
 ```
+> with project or workspace
 
 ## Install
 
@@ -37,12 +45,11 @@ swift build
 - [ArgumentParser](https://swift.org/blog/argument-parser/) for parsing command line arguments.
 - [FileKit](https://github.com/nvzqz/FileKit) for file browsing.
 - [AEXML](https://github.com/tadija/AEXML) for XML parsing and modifying.
-- [XcodeProjKit](https://github.com/phimage/XcodeProjKit) for Xcode project parsing.
+- [XcodeProjKit](https://github.com/phimage/XcodeProjKit) for Xcode project parsing and modifying.
 
 ## Why this project is named `punic`?
 
 > The ancient city was destroyed by the Roman Republic in the Third Punic War in 146 BC and then re-developed as Roman Carthage
-
-https://en.wikipedia.org/wiki/Carthage
+[@Wikipedia](https://en.wikipedia.org/wiki/Carthage)
 
 [![Punic Wars](https://pbs.twimg.com/media/DpPTMsgWwAAnXq1?format=jpg&name=thumb)](https://twitter.com/sara_boutall/status/1050415438923005958)
