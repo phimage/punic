@@ -12,67 +12,39 @@ import AEXML
 
 extension Punic {
 
-    struct Workspace: ParsableCommand {
-        @Option(default: "", help: "The project path.")
-        var path: String
+    struct Workspace: PunicCommand {
 
-        @Option(default: false, help: "Print debug information.")
-        var debug: Bool
+        @OptionGroup()
+        var options: Punic.Options
 
         func validate() throws {
-            let path = self.path
-            guard Path(path).exists else {
-                throw ValidationError("'<path>' \(path) doesn't not exist.")
-            }
-        }
-
-        func debug(_ message: String) {
-            if debug {
-                print(message)
-            }
-        }
-        func error(_ message: String) {
-            print("error: \(message)") // TODO: output in stderr
-        }
-
-        var rootPath: Path {
-            let parameterPath: Path = Path(self.path)
-            if parameterPath.has(extension: .xcworkspace) { // begentle if workspace passed as parameters
-                return parameterPath.parent
-            } else {
-                return parameterPath
-            }
-        }
-        
-        var workspacePath: Path? {
-            let parameterPath: Path = Path(self.path)
-            if parameterPath.has(extension: .xcworkspace) { 
-                return parameterPath
-            } else {
-                return parameterPath.findXcodeWorkspace()
-            }
+            try options.validate()
         }
 
         func run() {
-            let projectPath = self.rootPath
-            let carthagePath: Path = projectPath + sourceDir
-            guard let workspacePath: Path = self.workspacePath else {
-                error("Cannot find workspace in \(projectPath)") // XXX maybe create an empty one
+            run(options: self.options)
+        }
+
+        func run(options: Punic.Options) {
+            let rootPath = options.rootPath(extension: .xcworkspace)
+            let carthagePath: Path = rootPath + sourceDir
+            guard let workspacePath: Path = options.filePath(extension: .xcworkspace) else {
+                options.error("Cannot find workspace in \(rootPath)") // XXX maybe create an empty one
                 return
             }
 
             let workspaceDataPath: Path = workspacePath + "contents.xcworkspacedata"
             let workspaceDataFile = DataFile(path: workspaceDataPath)
             guard let workspaceData = try? workspaceDataFile.read() else {
-                error("Cannot read \(workspacePath)")
+                options.error("Cannot read \(workspacePath)")
                 return
             }
             guard let workspaceDocument = try? AEXMLDocument(xml: workspaceData) else {
-                error("Cannot parse \(workspacePath)")
+                options.error("Cannot parse \(workspacePath)")
                 return
             }
             guard let workspace = workspaceDocument.firstDescendant(where: { $0.name == "Workspace"}) else {
-                error("error: not a workspace, \(workspacePath)")
+                options.error("error: not a workspace, \(workspacePath)")
                 return
             }
 
@@ -88,12 +60,12 @@ extension Punic {
                     continue
                 }
                 guard let xcodeProjPath = dependecyPath.findXcodeProj() else {
-                    print("No xcodeproj for \(dependecyPath.fileName)")
+                    options.log("No xcodeproj for \(dependecyPath.fileName)")
                     continue
                 }
 
-                debug("📦 \(dependecyPath.fileName)")
-                var relativePath = xcodeProjPath.rawValue.replacingOccurrences(of: projectPath.rawValue, with: "")
+                options.debug("📦 \(dependecyPath.fileName)")
+                var relativePath = xcodeProjPath.rawValue.replacingOccurrences(of: rootPath.rawValue, with: "")
                 if relativePath.starts(with: "/") {
                     relativePath = String(relativePath.dropFirst())
                 }
@@ -101,23 +73,23 @@ extension Punic {
 
                 var fileRef = group?.firstDescendant(where: {$0.name == "FileRef" && $0.attributes["location"] == expectedLocation})
                 if fileRef == nil {
-                    print("➕ \(expectedLocation)")
+                    options.log("➕ \(expectedLocation)")
                     fileRef = group?.addChild(name: "FileRef", attributes: ["location": expectedLocation])
                     hasChange = true
                 } else {
-                    debug("❄️ \(expectedLocation)")
+                    options.debug("❄️ \(expectedLocation)")
                 }
             }
 
             if hasChange, let newData = workspaceDocument.xml.data(using: .utf8) {
                 do {
                     try workspaceDataFile.write(newData)
-                    print("💾 Workspace saved")
+                    options.log("💾 Workspace saved")
                 } catch let ioError {
-                    error("Cannot save workspace \(ioError)")
+                    options.error("Cannot save workspace \(ioError)")
                 }
             } else {
-                debug("❄️ Nothing to change")
+                options.debug("❄️ Nothing to change to workspace")
             }
         }
     }

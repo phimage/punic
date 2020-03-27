@@ -12,63 +12,35 @@ import XcodeProjKit
 
 extension Punic {
 
-    struct Project: ParsableCommand {
-        @Option(default: "", help: "The project path.")
-        var path: String
+    struct Project: PunicCommand {
 
-        @Option(default: false, help: "Print debug information.")
-        var debug: Bool
+        @OptionGroup()
+        var options: Punic.Options
 
         func validate() throws {
-            let path = self.path
-            guard Path(path).exists else {
-                throw ValidationError("'<path>' \(path) doesn't not exist.")
-            }
+            try options.validate()
         }
 
-        func debug(_ message: String) {
-            if debug {
-                print(message)
-            }
-        }
-        func error(_ message: String) {
-            print("error: \(message)") // TODO: output in stderr
-        }
-        
-        var rootPath: Path {
-            let parameterPath: Path = Path(self.path)
-            if parameterPath.has(extension: .xcodeproj) { // begentle if workspace passed as parameters
-                return parameterPath.parent
-            } else {
-                return parameterPath
-            }
-        }
-        
-        var projectPath: Path? {
-            let parameterPath: Path = Path(self.path)
-            if parameterPath.has(extension: .xcodeproj) {
-                return parameterPath
-            } else {
-                return parameterPath.find(extension: .xcodeproj)
-            }
-        }
-        
         func run() {
-            let rootPath = self.rootPath
-            guard let projectPath: Path = self.projectPath else {
-                error("Cannot find workspace in \(rootPath)") // XXX maybe create an empty one
+            run(options: self.options)
+        }
+
+        func run(options: Punic.Options) {
+            let rootPath = options.rootPath(extension: .xcodeproj)
+            guard let projectPath: Path = options.filePath(extension: .xcodeproj) else {
+                options.error("Cannot find workspace in \(rootPath)") // XXX maybe create an empty one
                 return
             }
 
             let projectDataPath: Path = projectPath + "project.pbxproj"
             let projectDataFile = DataFile(path: projectDataPath)
             guard let projectData = try? projectDataFile.read() else {
-                error("Cannot read \(projectPath)")
+                options.error("Cannot read \(projectPath)")
                 return
             }
 
             guard let xcodeProject = try? XcodeProj(propertyListData: projectData) else {
-                error("Cannot read \(projectPath)")
+                options.error("Cannot read \(projectPath)")
                 return
             }
 
@@ -83,7 +55,7 @@ extension Punic {
                             target.remove(object: scriptPhase, forKey: PBXTarget.PBXKeys.buildPhases)
                             scriptPhase.unattach()
                             hasChange = true
-                            debug("⚙️ Build script phrase \(scriptPhase.name ?? "") removed")
+                            options.log("⚙️ Build script phrase \(scriptPhase.name ?? "") removed")
                         }
                     }
                 }
@@ -96,7 +68,7 @@ extension Punic {
                                 hasChange = true
                                 buildSettings["FRAMEWORK_SEARCH_PATHS"]=searchPaths
                                 buildConfiguration.set(value: buildSettings, into: PBXBuildStyle.PBXKeys.buildSettings)
-                                debug("🔍 FRAMEWORK_SEARCH_PATHS edited for configuration \(buildConfiguration.name ?? buildConfiguration.description)")
+                                options.log("🔍 FRAMEWORK_SEARCH_PATHS edited for configuration \(buildConfiguration.name ?? buildConfiguration.description)")
                             }
                         }
                     }
@@ -115,7 +87,7 @@ extension Punic {
                         let name = fileRef.name ?? path
                         fileRef.set(value: name, into: PBXReference.PBXKeys.path)
                         hasChange = true
-                        debug("📦 \(String(describing: name)) path changed to \(buildProductsDir)")
+                        options.log("📦 \(String(describing: name)) path changed to \(buildProductsDir)")
                     }
                 }
             }
@@ -137,6 +109,7 @@ extension Punic {
                                 continue
                             }
                             guard !files.contains(where: { $0.fileRef as? PBXFileReference == fileRef}) else {
+                                options.debug("⏰ Already embeded framework \(fileRef.name ?? fileRef.path ?? fileRef.description)")
                                 continue // already added
                             }
                             let fields: PBXObject.Fields = [
@@ -150,7 +123,7 @@ extension Punic {
                             let embedFile = PBXBuildFile(ref: newRef, fields: fields, objects: xcodeProject.objects)
                             embedFile.attach()
                             copyfilesPhase.add(object: embedFile, into: PBXBuildPhase.PBXKeys.files)
-                            debug("🚀 Embed framework \(fileRef.name ?? fileRef.path ?? fileRef.description) with ref \(newRef)")
+                            options.log("🚀 Embed framework \(fileRef.name ?? fileRef.path ?? fileRef.description) with ref \(newRef)")
                             hasChange = true
                         }
                     }
@@ -161,12 +134,12 @@ extension Punic {
             if hasChange {
                 do {
                     try xcodeProject.write(to: projectDataPath.url, format: .openStep)
-                    print("💾 Project saved")
+                    options.log("💾 Project saved")
                 } catch let ioError {
-                    error("Cannot save project \(ioError)")
+                    options.error("Cannot save project \(ioError)")
                 }
             } else {
-                debug("❄️ Nothing to change")
+                options.debug("❄️ Nothing to change to project")
             }
         }
     }

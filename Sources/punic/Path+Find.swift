@@ -6,6 +6,9 @@
 import Foundation
 import FileKit
 
+let buildDir = "Carthage/Build"
+let sourceDir = "Carthage/Checkouts"
+
 extension Path {
     
     enum Extension: String {
