@@ -25,12 +25,18 @@ punic workspace
 punic project
 ```
 
+#### Edit all (workspace+project)
+
+```bash
+punic
+```
+
 ### or for specific path
 
 ```bash
 punic --path <your project root path>
 ```
-> with project or workspace
+> work also with subcommands project or workspace
 
 ## Install
 
@@ -38,6 +44,25 @@ punic --path <your project root path>
 
 ```bash
 swift build
+```
+
+## Output sample
+
+```
+➕ group:Carthage/Checkouts/Alamofire/Alamofire.xcodeproj
+➕ group:Carthage/Checkouts/Moya/Moya.xcodeproj
+➕ group:Carthage/Checkouts/Prephirences/Prephirences.xcodeproj
+💾 Workspace saved
+⚙️ Build script phrase Copy Frameworks removed
+🔍 FRAMEWORK_SEARCH_PATHS edited for configuration Debug
+🔍 FRAMEWORK_SEARCH_PATHS edited for configuration Release
+📦 Alamofire.framework path changed to BUILT_PRODUCTS_DIR
+📦 Moya.framework path changed to BUILT_PRODUCTS_DIR
+📦 Prephirences.framework path changed to BUILT_PRODUCTS_DIR
+🚀 Embed framework Alamofire.framework with ref 005DF40092F000CBE4009994
+🚀 Embed framework Moya.framework with ref 00E1C5002541000E0000FF11
+🚀 Embed framework Prephirences.framework with ref 0005CC00CB4000780B00588C
+💾 Project saved
 ```
 
 ## Dependencies
