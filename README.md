@@ -45,6 +45,7 @@ punic --path <your project root path>
 ```bash
 swift build
 ```
+> result in .build/debug/punic, could be copyed to /usr/local/bin/
 
 ## Output sample
 

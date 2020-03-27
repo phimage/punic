@@ -28,7 +28,7 @@ extension Punic {
         func run(options: Punic.Options) {
             let rootPath = options.rootPath(extension: .xcodeproj)
             guard let projectPath: Path = options.filePath(extension: .xcodeproj) else {
-                options.error("Cannot find workspace in \(rootPath)") // XXX maybe create an empty one
+                options.error("Cannot find project in \(rootPath)") // XXX maybe create an empty one
                 return
             }
 

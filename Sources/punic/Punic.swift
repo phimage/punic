@@ -57,7 +57,7 @@ struct Punic: ParsableCommand {
             }
         }
         func error(_ message: String) {
-            print("error: \(message)") // TODO: output in stderr
+            print("❌ error: \(message)") // TODO: output in stderr
         }
     }
 
