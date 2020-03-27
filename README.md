@@ -1,6 +1,7 @@
 # punic
 
 ![Swift](https://github.com/phimage/punic/workflows/Swift/badge.svg)
+![release](https://github.com/phimage/punic/workflows/release/badge.svg)
 
 - Add dependencies sources project introduced by [Carthage](https://github.com/Carthage/Carthage) into your Xcode workspace.
 - Remove copy framework build phrase from Xcode project and embed frameworks instead.
@@ -53,12 +54,18 @@ punic --quiet
 
 ## Install
 
+### Download the latest release
+
+[![release](https://img.shields.io/github/v/release/phimage/punic)](https://github.com/phimage/punic/releases/latest/download/punic.zip)
+
+unzip it and put it in your PATH (ex: /usr/local/bin/ )
+
 ### From source
 
 ```bash
 swift build
 ```
-> result in .build/debug/punic, could be copyed to /usr/local/bin/
+> result in .build/debug/punic, could be copied in your PATH (ex: /usr/local/bin/ )
 
 ## Output sample
 
