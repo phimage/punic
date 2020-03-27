@@ -38,10 +38,17 @@ punic --path <your project root path>
 ```
 > work also with subcommands project or workspace
 
-### more output informations
+### Output verbosity
+
+#### more output informations
 
 ```bash
-punic --debug true
+punic --verbose
+```
+#### no output informations
+
+```bash
+punic --quiet
 ```
 
 ## Install

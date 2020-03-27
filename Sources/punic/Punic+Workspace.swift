@@ -53,31 +53,19 @@ extension Punic {
             if group == nil {
                 group = workspace.addChild(name: "Group", attributes: ["location": "container:", "name": GroupName])
             }
+            
+            guard let groupElement = group else {
+                options.error("Cannot create Group XML element")
+                return
+            }
 
             var hasChange = false
-            for dependecyPath in carthagePath.children() {
-                guard dependecyPath.isDirectory else {
-                    continue
-                }
-                guard let xcodeProjPath = dependecyPath.findXcodeProj() else {
-                    options.log("No xcodeproj for \(dependecyPath.fileName)")
-                    continue
-                }
-
-                options.debug("📦 \(dependecyPath.fileName)")
-                var relativePath = xcodeProjPath.rawValue.replacingOccurrences(of: rootPath.rawValue, with: "")
-                if relativePath.starts(with: "/") {
-                    relativePath = String(relativePath.dropFirst())
-                }
-                let expectedLocation = "group:\(relativePath)"
-
-                var fileRef = group?.firstDescendant(where: {$0.name == "FileRef" && $0.attributes["location"] == expectedLocation})
-                if fileRef == nil {
-                    options.log("➕ \(expectedLocation)")
-                    fileRef = group?.addChild(name: "FileRef", attributes: ["location": expectedLocation])
-                    hasChange = true
-                } else {
-                    options.debug("❄️ \(expectedLocation)")
+            for dependencyPath in carthagePath.children() {
+                hasChange = addProject(from: dependencyPath, with: options, into: groupElement, rootPath: rootPath) || hasChange
+            }
+            if !options.devPath.isEmpty {
+                for dependencyPath in  Path(options.devPath).children() {
+                    hasChange = addProject(from: dependencyPath, with: options, into: groupElement, rootPath: rootPath) || hasChange
                 }
             }
 
@@ -92,5 +80,32 @@ extension Punic {
                 options.debug("❄️ Nothing to change to workspace")
             }
         }
+
+        func addProject(from path: Path, with options: Punic.Options, into group: AEXMLElement, rootPath: Path) -> Bool {
+            guard path.isDirectory else {
+                return false
+            }
+            guard let xcodeProjPath = path.findXcodeProj() else {
+                options.log("No xcodeproj for \(path.fileName)")
+               return false
+            }
+            options.debug("📦 \(path.fileName)")
+            var relativePath = xcodeProjPath.rawValue.replacingOccurrences(of: rootPath.rawValue, with: "")
+            if relativePath.starts(with: "/") {
+                relativePath = String(relativePath.dropFirst())
+            }
+            let expectedLocation = "group:\(relativePath)"
+
+            var fileRef = group.firstDescendant(where: {$0.name == "FileRef" && $0.attributes["location"] == expectedLocation})
+            if fileRef == nil {
+                options.log("➕ \(expectedLocation)")
+                fileRef = group.addChild(name: "FileRef", attributes: ["location": expectedLocation])
+                return true
+            } else {
+                options.debug("❄️ \(expectedLocation)")
+            }
+            return false
+        }
     }
+
 }

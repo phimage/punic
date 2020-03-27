@@ -17,12 +17,19 @@ struct Punic: ParsableCommand {
         defaultSubcommand: All.self)
 
     struct Options: ParsableArguments {
+
         @Option(default: "", help: "The project path.")
         var path: String
         
-        @Option(default: false, help: "Print debug information.")
-        var debug: Bool
-        
+        @Flag(help: "Print debug information.")
+        var verbose: Bool
+
+        @Option(default: "", help: "An optionnal path to find other projects.")
+        var devPath: String
+
+        @Flag(help: "No output information")
+        var quiet: Bool
+
         func validate() throws {
             let path = self.path
             guard Path(path).exists else {
@@ -49,14 +56,23 @@ struct Punic: ParsableCommand {
         }
 
         func log(_ message: String) {
+            if quiet {
+                return
+            }
             print(message)
         }
         func debug(_ message: String) {
-            if self.debug {
+            if quiet {
+                return
+            }
+            if self.verbose {
                 print(message)
             }
         }
         func error(_ message: String) {
+            if quiet {
+                return
+            }
             print("❌ error: \(message)") // TODO: output in stderr
         }
     }

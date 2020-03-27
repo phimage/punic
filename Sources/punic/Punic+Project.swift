@@ -109,7 +109,7 @@ extension Punic {
                                 continue
                             }
                             guard !files.contains(where: { $0.fileRef as? PBXFileReference == fileRef}) else {
-                                options.debug("⏰ Already embeded framework \(fileRef.name ?? fileRef.path ?? fileRef.description)")
+                                options.debug("❄️ Already embeded framework \(fileRef.name ?? fileRef.path ?? fileRef.description)")
                                 continue // already added
                             }
                             let fields: PBXObject.Fields = [
