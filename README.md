@@ -38,6 +38,12 @@ punic --path <your project root path>
 ```
 > work also with subcommands project or workspace
 
+### more output informations
+
+```bash
+punic --debug true
+```
+
 ## Install
 
 ### From source
