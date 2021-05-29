@@ -1,0 +1,43 @@
+{
+  "object": {
+    "pins": [
+      {
+        "package": "AEXML",
+        "repositoryURL": "https://github.com/tadija/AEXML.git",
+        "state": {
+          "branch": null,
+          "revision": "502c4d43a6cc9c395d19111e09dc62ad834977b5",
+          "version": "4.6.0"
+        }
+      },
+      {
+        "package": "FileKit",
+        "repositoryURL": "https://github.com/nvzqz/FileKit.git",
+        "state": {
+          "branch": null,
+          "revision": "826d9161b184509f80d85c28cd612d630646de98",
+          "version": "6.0.0"
+        }
+      },
+      {
+        "package": "swift-argument-parser",
+        "repositoryURL": "https://github.com/apple/swift-argument-parser",
+        "state": {
+          "branch": null,
+          "revision": "986d191f94cec88f6350056da59c2e59e83d1229",
+          "version": "0.4.3"
+        }
+      },
+      {
+        "package": "XcodeProjKit",
+        "repositoryURL": "https://github.com/phimage/XcodeProjKit.git",
+        "state": {
+          "branch": null,
+          "revision": "1fc861d368831f751341f804298e78ebb789592e",
+          "version": "2.2.0"
+        }
+      }
+    ]
+  },
+  "version": 1
+}

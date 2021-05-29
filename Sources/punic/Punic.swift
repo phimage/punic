@@ -13,22 +13,22 @@ struct Punic: ParsableCommand {
   
     static let configuration = CommandConfiguration(
         abstract: "Inject carthage xcodeproj into workspace.",
-        subcommands: [All.self, Workspace.self, Project.self],
+        subcommands: [All.self, Workspace.self, Project.self, X.self],
         defaultSubcommand: All.self)
 
     struct Options: ParsableArguments {
 
-        @Option(default: "", help: "The project path.")
-        var path: String
+        @Option(help: "The project path.")
+        var path: String = ""
         
         @Flag(help: "Print debug information.")
-        var verbose: Bool
+        var verbose: Bool = false
 
-        @Option(default: "", help: "An optionnal path to find other projects.")
-        var devPath: String
+        @Option(help: "An optionnal path to find other projects.")
+        var devPath: String = ""
 
         @Flag(help: "No output information")
-        var quiet: Bool
+        var quiet: Bool = false
 
         func validate() throws {
             let path = self.path
