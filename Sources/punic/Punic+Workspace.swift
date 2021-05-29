@@ -28,6 +28,32 @@ extension Punic {
         func run(options: Punic.Options) {
             let rootPath = options.rootPath(extension: .xcworkspace)
             let carthagePath: Path = rootPath + sourceDir
+
+            var created = false
+            if options.filePath(extension: .xcworkspace) == nil,
+               let projectPath: Path = options.filePath(extension: .xcodeproj) {
+                // if no workspace but a project we could create it
+                let xmlString = """
+                <?xml version="1.0" encoding="UTF-8"?>
+                <Workspace
+                   version = "1.0">
+                   <FileRef
+                      location = "container:\(projectPath.fileName)">
+                   </FileRef>
+                </Workspace>
+                """
+                let workspacePath: Path = projectPath.of(extension: .xcworkspace)
+                if let data = xmlString.data(using: .utf8) {
+                    do {
+                        try workspacePath.createDirectory()
+                        try DataFile(path: workspacePath + "contents.xcworkspacedata").write(data)
+                        created = true
+                    } catch let ioError {
+                        options.error("Cannot save new create workspace \(ioError)")
+                    }
+                }
+            }
+
             guard let workspacePath: Path = options.filePath(extension: .xcworkspace) else {
                 options.error("Cannot find workspace in \(rootPath)") // XXX maybe create an empty one
                 return
@@ -72,7 +98,7 @@ extension Punic {
             if hasChange, let newData = workspaceDocument.xml.data(using: .utf8) {
                 do {
                     try workspaceDataFile.write(newData)
-                    options.log("💾 Workspace saved")
+                    options.log("💾 Workspace \(created ? "created": "saved")")
                 } catch let ioError {
                     options.error("Cannot save workspace \(ioError)")
                 }

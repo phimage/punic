@@ -60,4 +60,10 @@ extension Path {
     func has(extension ext: Extension) -> Bool {
         return self.pathExtension == ext.rawValue
     }
+
+    func of(extension ext: Extension) -> Path {
+        var path = self.parent + self.fileName
+        path.pathExtension = ext.rawValue
+        return path
+    }
 }
