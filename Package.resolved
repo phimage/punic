@@ -1,43 +1,42 @@
 {
-  "object": {
-    "pins": [
-      {
-        "package": "AEXML",
-        "repositoryURL": "https://github.com/tadija/AEXML.git",
-        "state": {
-          "branch": null,
-          "revision": "502c4d43a6cc9c395d19111e09dc62ad834977b5",
-          "version": "4.6.0"
-        }
-      },
-      {
-        "package": "FileKit",
-        "repositoryURL": "https://github.com/nvzqz/FileKit.git",
-        "state": {
-          "branch": null,
-          "revision": "826d9161b184509f80d85c28cd612d630646de98",
-          "version": "6.0.0"
-        }
-      },
-      {
-        "package": "swift-argument-parser",
-        "repositoryURL": "https://github.com/apple/swift-argument-parser",
-        "state": {
-          "branch": null,
-          "revision": "986d191f94cec88f6350056da59c2e59e83d1229",
-          "version": "0.4.3"
-        }
-      },
-      {
-        "package": "XcodeProjKit",
-        "repositoryURL": "https://github.com/phimage/XcodeProjKit.git",
-        "state": {
-          "branch": null,
-          "revision": "1fc861d368831f751341f804298e78ebb789592e",
-          "version": "2.2.0"
-        }
+  "originHash" : "0125427096547de5c4d770712178c89ae6e68229be1f69c5de44c00b48c67934",
+  "pins" : [
+    {
+      "identity" : "aexml",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/tadija/AEXML.git",
+      "state" : {
+        "revision" : "db806756c989760b35108146381535aec231092b",
+        "version" : "4.7.0"
       }
-    ]
-  },
-  "version": 1
+    },
+    {
+      "identity" : "filekit",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/nvzqz/FileKit.git",
+      "state" : {
+        "revision" : "826d9161b184509f80d85c28cd612d630646de98",
+        "version" : "6.0.0"
+      }
+    },
+    {
+      "identity" : "swift-argument-parser",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/apple/swift-argument-parser",
+      "state" : {
+        "revision" : "011f0c765fb46d9cac61bca19be0527e99c98c8b",
+        "version" : "1.5.1"
+      }
+    },
+    {
+      "identity" : "xcodeprojkit",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/phimage/XcodeProjKit.git",
+      "state" : {
+        "revision" : "7dc8cb8d967fd49c205d2a449e6fa609abd37ef5",
+        "version" : "4.0.0"
+      }
+    }
+  ],
+  "version" : 3
 }

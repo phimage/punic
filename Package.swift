@@ -1,4 +1,4 @@
-// swift-tools-version:5.3
+// swift-tools-version:6.0
 // The swift-tools-version declares the minimum version of Swift required to build this package.
 
 import PackageDescription
@@ -6,16 +6,13 @@ import PackageDescription
 let package = Package(
     name: "punic",
     products: [
-        // Products define the executables and libraries produced by a package, and make them visible to other packages.
-        .executable(
-            name: "punic",
-            targets: ["punic"])
+        .executable(name: "punic", targets: ["punic"])
     ],
     dependencies: [
-        .package(url: "https://github.com/tadija/AEXML.git", from: "4.5.0"),
+        .package(url: "https://github.com/tadija/AEXML.git", from: "4.7.0"),
         .package(url: "https://github.com/nvzqz/FileKit.git", from: "6.0.0"),
-        .package(url: "https://github.com/apple/swift-argument-parser", from: "0.0.2"),
-        .package(url: "https://github.com/phimage/XcodeProjKit.git", from: "2.1.5")
+        .package(url: "https://github.com/apple/swift-argument-parser", from: "1.5.1"),
+        .package(url: "https://github.com/phimage/XcodeProjKit.git", from: "4.0.0")
     ],
     targets: [
         .target(
